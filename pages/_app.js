@@ -1,37 +1,45 @@
 import App, { Container } from "next/app";
-// import cs
+import { Provider } from "react-redux";
+
 import "antd/dist/antd.css";
+
+import MyContext from "../lib/my-context";
 import Layout from "../components/Layout";
 
-//overwrite next 自带的app component
-//保持一些公用的状态(global varaible)
-//固定layout
-//给页面pass一些自定义的data
-//自定义error hanlder
+import testHoc from "../lib/with-redux";
 
 class MyApp extends App {
-  // must have getInitialProps!!!!
-  static async getInitialProps({ Component }) {
-    let pageProps;
-    if (Component.getInitialProps) {
-      pageProps = await Component.getInitialProps();
-    }
+  state = {
+    context: "value",
+  };
 
+  static async getInitialProps(ctx) {
+    const { Component } = ctx;
+    console.log("app init");
+    let pageProps = {};
+    if (Component.getInitialProps) {
+      pageProps = await Component.getInitialProps(ctx);
+    }
     return {
       pageProps,
     };
   }
 
   render() {
-    const { Component, pageProps } = this.props;
+    const { Component, pageProps, reduxStore } = this.props;
+
     return (
       <Container>
         <Layout>
-          <Component {...pageProps} />
+          <Provider store={reduxStore}>
+            <MyContext.Provider value={this.state.context}>
+              <Component {...pageProps} />
+            </MyContext.Provider>
+          </Provider>
         </Layout>
       </Container>
     );
   }
 }
 
-export default MyApp;
+export default testHoc(MyApp);

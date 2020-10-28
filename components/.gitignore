@@ -1,6 +1,6 @@
-ode_modules
 .next
 *.rdb
 .ecosystem.*
 config.js
 bundles
+node_modules
