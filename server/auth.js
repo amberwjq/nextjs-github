@@ -52,4 +52,15 @@ module.exports = (server) => {
       await next();
     }
   });
+
+  server.use(async (ctx, next) => {
+    const method = ctx.method;
+    const path = ctx.path;
+    if (path === "/logout" && method === "POST") {
+      ctx.session = null;
+      ctx.body = "logout success";
+    } else {
+      await next();
+    }
+  });
 };

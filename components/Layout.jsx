@@ -13,15 +13,10 @@ import Link from "next/link";
 import { useState, useCallback } from "react";
 import getCofnig from "next/config";
 import { connect } from "react-redux";
+import { logout } from "../store/store";
 
 const { publicRuntimeConfig } = getCofnig();
-const userDropdown = (
-  <Menu>
-    <Menu.Item>
-      <a href="javascript.void(0)"> Sign Out</a>
-    </Menu.Item>
-  </Menu>
-);
+
 const githubIconStyle = {
   color: "white",
   fontSize: 40,
@@ -30,13 +25,25 @@ const githubIconStyle = {
   marginRight: 20,
 };
 const { Header, Content, Footer } = Layout;
-const MyLayout = ({ children, user }) => {
+const MyLayout = ({ children, user, logout }) => {
   const [search, setSearch] = useState();
+  const handleOnSearch = useCallback(() => {});
   const handleSearchChange = useCallback((event) => {
     setSearch(event.target.value);
   }, []);
-
-  const handleOnSearch = useCallback(() => {}, []);
+  const handleSignOut = useCallback(() => {
+    console.log("call logout");
+    logout();
+  }, []);
+  const userDropdown = (
+    <Menu>
+      <Menu.Item>
+        <a href="javascript:void(0)" onClick={handleSignOut}>
+          Sign Out
+        </a>
+      </Menu.Item>
+    </Menu>
+  );
   return (
     <Layout>
       <Header>
@@ -100,8 +107,15 @@ const MyLayout = ({ children, user }) => {
     </Layout>
   );
 };
-export default connect(function mapState(state) {
-  return {
-    user: state.user,
-  };
-})(MyLayout);
+export default connect(
+  function mapState(state) {
+    return {
+      user: state.user,
+    };
+  },
+  function mapReducer(dispatch) {
+    return {
+      logout: () => dispatch(logout()),
+    };
+  }
+)(MyLayout);
