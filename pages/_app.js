@@ -30,13 +30,13 @@ class MyApp extends App {
 
     return (
       <Container>
-        <Layout>
-          <Provider store={reduxStore}>
+        <Provider store={reduxStore}>
+          <Layout>
             <MyContext.Provider value={this.state.context}>
               <Component {...pageProps} />
             </MyContext.Provider>
-          </Provider>
-        </Layout>
+          </Layout>
+        </Provider>
       </Container>
     );
   }

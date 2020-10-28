@@ -10,35 +10,7 @@ import getCofnig from "next/config";
 
 const { publicRuntimeConfig } = getCofnig();
 
-import { add } from "../store/store";
-
-const events = [
-  "routeChangeStart",
-  "routeChangeComplete",
-  "routeChangeError",
-  "beforeHistoryChange",
-  "hashChangeStart",
-  "hashChangeComplete",
-];
-
-function makeEvent(type) {
-  return (...args) => {
-    console.log(type, ...args);
-  };
-}
-
-events.forEach((event) => {
-  Router.events.on(event, makeEvent(event));
-});
-
-// Router.events.on('routeChangeStart', (...args) => console.log(args))
-// Router.events.on('routeChangeComplete', (...args) => console.log(args))
-// Router.events.on('routeChangeError', (...args) => console.log(args))
-// Router.events.on('beforeHistoryChange', (...args) => console.log(args))
-// Router.events.on('hashChangeStart', (...args) => console.log(args))
-// Router.events.on('hashChangeComplete', (...args) => console.log(args))
-
-const Index = ({ counter, username, rename, add }) => {
+const Index = ({}) => {
   function gotoTestB() {
     Router.push(
       {
@@ -57,31 +29,17 @@ const Index = ({ counter, username, rename, add }) => {
 
   return (
     <>
-      <span>Count: {counter}</span>
-      <a>UserName: {username}</a>
-      <input value={username} onChange={(e) => rename(e.target.value)} />
-      <button onClick={() => add(counter)}>do add</button>
       <a href={publicRuntimeConfig.OAUTH_URL}>去登录</a>
     </>
   );
 };
 
 Index.getInitialProps = async ({ reduxStore }) => {
-  reduxStore.dispatch(add(3));
   return {};
 };
 
-export default connect(
-  function mapStateToProps(state) {
-    return {
-      counter: state.counter.count,
-      username: state.user.username,
-    };
-  },
-  function mapDispatchToProps(dispatch) {
-    return {
-      add: (num) => dispatch({ type: "ADD", num }),
-      rename: (name) => dispatch({ type: "UPDATE_USERNAME", name }),
-    };
-  }
-)(Index);
+export default connect(function mapStateToProps(state) {
+  return {
+    user: state.user,
+  };
+})(Index);

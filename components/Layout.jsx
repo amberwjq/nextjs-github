@@ -1,6 +1,27 @@
-import { Button, Layout, Icon, Search, Avatar, Input } from "antd";
+import {
+  Button,
+  Layout,
+  Icon,
+  Search,
+  Avatar,
+  Input,
+  Tooltip,
+  Dropdown,
+  Menu,
+} from "antd";
 import Link from "next/link";
 import { useState, useCallback } from "react";
+import getCofnig from "next/config";
+import { connect } from "react-redux";
+
+const { publicRuntimeConfig } = getCofnig();
+const userDropdown = (
+  <Menu>
+    <Menu.Item>
+      <a href="javascript.void(0)"> Sign Out</a>
+    </Menu.Item>
+  </Menu>
+);
 const githubIconStyle = {
   color: "white",
   fontSize: 40,
@@ -9,7 +30,7 @@ const githubIconStyle = {
   marginRight: 20,
 };
 const { Header, Content, Footer } = Layout;
-export default ({ children }) => {
+const MyLayout = ({ children, user }) => {
   const [search, setSearch] = useState();
   const handleSearchChange = useCallback((event) => {
     setSearch(event.target.value);
@@ -26,7 +47,7 @@ export default ({ children }) => {
             </div>
             <div>
               <Input.Search
-                placehoder="Search Repo..."
+                placeholder="Search Repo..."
                 value={search}
                 onChange={handleSearchChange}
                 onSearch={handleOnSearch}
@@ -35,7 +56,19 @@ export default ({ children }) => {
           </div>
           <div className="header-right">
             <div className="user">
-              <Avatar size={40} icon="user" />
+              {user && user.id ? (
+                <Dropdown overlay={userDropdown}>
+                  <a href="/">
+                    <Avatar size={40} src={user.avatar_url} />
+                  </a>
+                </Dropdown>
+              ) : (
+                <Tooltip title="Click To Sign In">
+                  <a href={publicRuntimeConfig.OAUTH_URL}>
+                    <Avatar size={40} icon="user" />
+                  </a>
+                </Tooltip>
+              )}
             </div>
           </div>
         </div>
@@ -67,3 +100,8 @@ export default ({ children }) => {
     </Layout>
   );
 };
+export default connect(function mapState(state) {
+  return {
+    user: state.user,
+  };
+})(MyLayout);

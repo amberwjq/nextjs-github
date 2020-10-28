@@ -40,7 +40,7 @@ module.exports = (server) => {
           },
         });
 
-        // console.log(userInfoResp.data)
+        console.log("ctx.session.userInfo");
         ctx.session.userInfo = userInfoResp.data;
 
         ctx.redirect("/");
