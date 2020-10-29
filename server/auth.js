@@ -40,10 +40,11 @@ module.exports = (server) => {
           },
         });
 
-        console.log("ctx.session.userInfo");
         ctx.session.userInfo = userInfoResp.data;
-
-        ctx.redirect("/");
+        console.log("ctx.session.userInfo", ctx.session.userInfo);
+        console.log("ctx session", ctx.session);
+        ctx.redirect((ctx.session && ctx.session.urlBeforeOAuth) || "/");
+        ctx.session.urlBeforeOAuth = null;
       } else {
         const errorMsg = result.data && result.data.error;
         ctx.body = `request token failed ${errorMsg}`;
@@ -59,6 +60,21 @@ module.exports = (server) => {
     if (path === "/logout" && method === "POST") {
       ctx.session = null;
       ctx.body = "logout success";
+    } else {
+      await next();
+    }
+  });
+
+  server.use(async (ctx, next) => {
+    const method = ctx.method;
+    const path = ctx.path;
+    if (path === "/prepare-auth" && method === "GET") {
+      const { url } = ctx.query; // the url before doing OAuth
+      ctx.session.urlBeforeOAuth = url;
+      console.log("ctx session", ctx.session);
+      console.log("config", config);
+      console.log(config.OAUTH_URL);
+      ctx.redirect(config.github.OAUTH_URL);
     } else {
       await next();
     }

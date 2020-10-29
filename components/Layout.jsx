@@ -10,10 +10,12 @@ import {
   Menu,
 } from "antd";
 import Link from "next/link";
+import { withRouter } from "next/router";
 import { useState, useCallback } from "react";
 import getCofnig from "next/config";
 import { connect } from "react-redux";
 import { logout } from "../store/store";
+import axios from "axios";
 
 const { publicRuntimeConfig } = getCofnig();
 
@@ -25,7 +27,7 @@ const githubIconStyle = {
   marginRight: 20,
 };
 const { Header, Content, Footer } = Layout;
-const MyLayout = ({ children, user, logout }) => {
+const MyLayout = ({ children, user, logout, router }) => {
   const [search, setSearch] = useState();
   const handleOnSearch = useCallback(() => {});
   const handleSearchChange = useCallback((event) => {
@@ -34,7 +36,7 @@ const MyLayout = ({ children, user, logout }) => {
   const handleSignOut = useCallback(() => {
     console.log("call logout");
     logout();
-  }, []);
+  }, [logout]); //depend on props logout
   const userDropdown = (
     <Menu>
       <Menu.Item>
@@ -71,7 +73,7 @@ const MyLayout = ({ children, user, logout }) => {
                 </Dropdown>
               ) : (
                 <Tooltip title="Click To Sign In">
-                  <a href={publicRuntimeConfig.OAUTH_URL}>
+                  <a href={`/prepare-auth?url=${router.asPath}`}>
                     <Avatar size={40} icon="user" />
                   </a>
                 </Tooltip>
@@ -118,4 +120,4 @@ export default connect(
       logout: () => dispatch(logout()),
     };
   }
-)(MyLayout);
+)(withRouter(MyLayout));
