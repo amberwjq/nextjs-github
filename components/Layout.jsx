@@ -8,33 +8,36 @@ import {
   Tooltip,
   Dropdown,
   Menu,
-} from "antd";
-import Link from "next/link";
-import { withRouter } from "next/router";
-import { useState, useCallback } from "react";
-import getCofnig from "next/config";
-import { connect } from "react-redux";
-import { logout } from "../store/store";
-import axios from "axios";
+} from 'antd';
+import Link from 'next/link';
+import { withRouter } from 'next/router';
+import { useState, useCallback } from 'react';
+import getCofnig from 'next/config';
+import { connect } from 'react-redux';
+import { logout } from '../store/store';
+import axios from 'axios';
 
 const { publicRuntimeConfig } = getCofnig();
 
 const githubIconStyle = {
-  color: "white",
+  color: 'white',
   fontSize: 40,
-  display: "block",
+  display: 'block',
   paddingTop: 10,
   marginRight: 20,
 };
 const { Header, Content, Footer } = Layout;
 const MyLayout = ({ children, user, logout, router }) => {
-  const [search, setSearch] = useState();
-  const handleOnSearch = useCallback(() => {});
+  const urlQuery = router.query && router.query.query;
+  const [search, setSearch] = useState(urlQuery || '');
+  const handleOnSearch = useCallback(() => {
+    router.push(`/search?query=${search}`);
+  }, [search]);
   const handleSearchChange = useCallback((event) => {
     setSearch(event.target.value);
   }, []);
   const handleSignOut = useCallback(() => {
-    console.log("call logout");
+    console.log('call logout');
     logout();
   }, [logout]); //depend on props logout
   const userDropdown = (
@@ -52,7 +55,9 @@ const MyLayout = ({ children, user, logout, router }) => {
         <div className="header-inner">
           <div className="header-left">
             <div className="logo">
-              <Icon type="github" style={githubIconStyle} />
+              <Link href="/">
+                <Icon type="github" style={githubIconStyle} />
+              </Link>
             </div>
             <div>
               <Input.Search
@@ -83,7 +88,7 @@ const MyLayout = ({ children, user, logout, router }) => {
         </div>
       </Header>
       <Content>{children} </Content>
-      <Footer style={{ textAlign: "center" }}>
+      <Footer style={{ textAlign: 'center' }}>
         Created by Amber @
         <a href="mailto:amberwjq@gmail.com">amberwjq@gmail.com</a>
       </Footer>
@@ -103,7 +108,10 @@ const MyLayout = ({ children, user, logout, router }) => {
           height: 100%;
         }
         .ant-layout {
-          height: 100%;
+          min-height: 100%;
+        }
+        .ant-layout-content {
+          background-color: white;
         }
       `}</style>
     </Layout>

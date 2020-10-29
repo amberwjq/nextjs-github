@@ -1,14 +1,15 @@
-const Koa = require("koa");
-const Router = require("koa-router");
-const next = require("next");
-const session = require("koa-session");
-const Redis = require("ioredis");
+const Koa = require('koa');
+const Router = require('koa-router');
+const next = require('next');
+const session = require('koa-session');
+const Redis = require('ioredis');
 
-const auth = require("./server/auth");
+const auth = require('./server/auth');
+const api = require('./server/api');
 
-const RedisSessionStore = require("./server/session-store");
+const RedisSessionStore = require('./server/session-store');
 
-const dev = process.env.NODE_ENV !== "production";
+const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
@@ -19,9 +20,9 @@ app.prepare().then(() => {
   const server = new Koa();
   const router = new Router();
 
-  server.keys = ["Jokcy develop Github App"];
+  server.keys = ['Jokcy develop Github App'];
   const SESSION_CONFIG = {
-    key: "jid",
+    key: 'jid',
     store: new RedisSessionStore(redis),
   };
 
@@ -29,17 +30,18 @@ app.prepare().then(() => {
 
   // 配置处理github OAuth的登录
   auth(server);
+  api(server);
 
-  router.get("/a/:id", async (ctx) => {
+  router.get('/a/:id', async (ctx) => {
     const id = ctx.params.id;
     await handle(ctx.req, ctx.res, {
-      pathname: "/a",
+      pathname: '/a',
       query: { id },
     });
     ctx.respond = false;
   });
 
-  router.get("/api/user/info", async (ctx) => {
+  router.get('/api/user/info', async (ctx) => {
     // const id = ctx.params.id
     // await handle(ctx.req, ctx.res, {
     //   pathname: '/a',
@@ -49,10 +51,10 @@ app.prepare().then(() => {
     const user = ctx.session.userInfo;
     if (!user) {
       ctx.status = 401;
-      ctx.body = "Need Login";
+      ctx.body = 'Need Login';
     } else {
       ctx.body = user;
-      ctx.set("Content-Type", "application/json");
+      ctx.set('Content-Type', 'application/json');
     }
   });
 
@@ -71,7 +73,7 @@ app.prepare().then(() => {
   });
 
   server.listen(3000, () => {
-    console.log("koa server listening on 3000");
+    console.log('koa server listening on 3000');
   });
 
   // ctx.body

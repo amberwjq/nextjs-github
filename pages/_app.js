@@ -1,6 +1,6 @@
 import App, { Container } from 'next/app';
 import { Provider } from 'react-redux';
-
+import axios from 'axios';
 import 'antd/dist/antd.css';
 import Router from 'next/router';
 import MyContext from '../lib/my-context';
@@ -29,6 +29,12 @@ class MyApp extends App {
     Router.events.on('routeChangeStart', this.startLoading);
     Router.events.on('routeChangeComplete', this.stopLoading);
     Router.events.on('routeChangeError', this.stopLoading);
+
+    axios
+      .get('https://api.github.com/search/repositories?q=react')
+      .then((res) => {
+        console.log('git repos', res);
+      });
   }
 
   componentWillUnmount() {
