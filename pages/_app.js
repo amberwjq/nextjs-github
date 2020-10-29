@@ -1,21 +1,45 @@
-import App, { Container } from "next/app";
-import { Provider } from "react-redux";
+import App, { Container } from 'next/app';
+import { Provider } from 'react-redux';
 
-import "antd/dist/antd.css";
+import 'antd/dist/antd.css';
+import Router from 'next/router';
+import MyContext from '../lib/my-context';
+import Layout from '../components/Layout';
 
-import MyContext from "../lib/my-context";
-import Layout from "../components/Layout";
-
-import testHoc from "../lib/with-redux";
+import testHoc from '../lib/with-redux';
+import PageLoading from '../components/PageLoading';
 
 class MyApp extends App {
   state = {
-    context: "value",
+    context: 'value',
+    loading: false,
   };
+  startLoading = () => {
+    this.setState({
+      loading: true,
+    });
+  };
+
+  stopLoading = () => {
+    this.setState({
+      loading: false,
+    });
+  };
+  componentDidMount() {
+    Router.events.on('routeChangeStart', this.startLoading);
+    Router.events.on('routeChangeComplete', this.stopLoading);
+    Router.events.on('routeChangeError', this.stopLoading);
+  }
+
+  componentWillUnmount() {
+    Router.events.off('routeChangeStart', this.startLoading);
+    Router.events.off('routeChangeComplete', this.stopLoading);
+    Router.events.off('routeChangeError', this.stopLoading);
+  }
 
   static async getInitialProps(ctx) {
     const { Component } = ctx;
-    console.log("app init");
+    console.log('app init');
     let pageProps = {};
     if (Component.getInitialProps) {
       pageProps = await Component.getInitialProps(ctx);
@@ -31,6 +55,7 @@ class MyApp extends App {
     return (
       <Container>
         <Provider store={reduxStore}>
+          {this.state.loaindg ? <PageLoading /> : null}
           <Layout>
             <MyContext.Provider value={this.state.context}>
               <Component {...pageProps} />
